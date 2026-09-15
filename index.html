@@ -90,7 +90,9 @@
         <p>Lista de todos os projetos, com opções de edição e exclusão.</p>
       </div>
       <div class="toolbar">
+        <label class="sr-only" for="f-search">Buscar por nome ou responsável</label>
         <input type="search" id="f-search" placeholder="Buscar por nome ou responsável…">
+        <label class="sr-only" for="f-filter-status">Filtrar por status</label>
         <select id="f-filter-status">
           <option value="">Todos os status</option>
           <option value="planejado">Planejado</option>
@@ -127,8 +129,8 @@
 </div>
 
 <div class="modal-overlay" id="confirm-overlay" hidden>
-  <div class="modal">
-    <h3>Excluir projeto</h3>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <h3 id="confirm-title">Excluir projeto</h3>
     <p id="confirm-text">Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita.</p>
     <div class="modal-actions">
       <button type="button" class="btn-secondary" id="confirm-cancel">Cancelar</button>

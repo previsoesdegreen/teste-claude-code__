@@ -96,6 +96,7 @@ Nenhuma outra integração externa (sem APIs de terceiros, sem analytics, sem te
 3. **Status "Atrasado" como valor derivado, não armazenado**: evita inconsistência entre o campo salvo e a passagem do tempo — recalculado a cada renderização a partir da data do sistema.
 4. **Separação `storage.js` / `app.js`**: mantém a camada de persistência isolada da camada de apresentação, facilitando uma futura troca de mecanismo de persistência sem reescrever a lógica de UI.
 5. **Regras de negócio extraídas como funções puras (`validateProjectData`, `effectiveStatus`)**: permitem testar a lógica crítica isoladamente do DOM, sem exigir framework de testes ou build. Ver `DECISIONS.md`.
+6. **Tokens de cor dedicados por contexto (`--accent-badge`, `--eyebrow-ink`) em vez de reaproveitar `--accent` em todo lugar**: quando um mesmo token era usado como texto sobre fundos opostos (claro/escuro) com necessidades de contraste conflitantes, optou-se por variáveis específicas por contexto em vez de um valor de compromisso único. Ver `DECISIONS.md` (BKL-104).
 
 ## 7. Restrições atuais conhecidas
 

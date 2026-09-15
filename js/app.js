@@ -34,6 +34,22 @@
 
   var pendingDeleteId = null;
   var toastTimer = null;
+  var deleteTriggerEl = null;
+
+  function openConfirmModal(triggerEl) {
+    deleteTriggerEl = triggerEl;
+    confirmOverlay.hidden = false;
+    confirmCancel.focus();
+  }
+
+  function closeConfirmModal() {
+    pendingDeleteId = null;
+    confirmOverlay.hidden = true;
+    if (deleteTriggerEl && document.contains(deleteTriggerEl)) {
+      deleteTriggerEl.focus();
+    }
+    deleteTriggerEl = null;
+  }
 
   function todayISO() {
     var d = new Date();
@@ -219,8 +235,8 @@
         '<td><span class="badge ' + st + '">' + STATUS_LABEL[st] + "</span></td>" +
         '<td><div class="progress-cell"><span class="progress-bar"><span style="width:' + p.progresso + '%"></span></span>' + p.progresso + "%</div></td>" +
         '<td class="num"><div class="row-actions">' +
-          '<button type="button" class="icon-btn" data-action="edit" data-id="' + p.id + '">Editar</button>' +
-          '<button type="button" class="icon-btn danger" data-action="delete" data-id="' + p.id + '">Excluir</button>' +
+          '<button type="button" class="icon-btn" data-action="edit" data-id="' + p.id + '" aria-label="Editar ' + escapeHtml(p.nome) + '">Editar</button>' +
+          '<button type="button" class="icon-btn danger" data-action="delete" data-id="' + p.id + '" aria-label="Excluir ' + escapeHtml(p.nome) + '">Excluir</button>' +
         "</div></td>";
       tableBody.appendChild(tr);
     });
@@ -270,13 +286,12 @@
       startEdit(id);
     } else if (action === "delete") {
       pendingDeleteId = id;
-      confirmOverlay.hidden = false;
+      openConfirmModal(btn);
     }
   });
 
   confirmCancel.addEventListener("click", function () {
-    pendingDeleteId = null;
-    confirmOverlay.hidden = true;
+    closeConfirmModal();
   });
 
   confirmOk.addEventListener("click", function () {
@@ -286,14 +301,18 @@
       if (idField.value === pendingDeleteId) resetForm();
       renderAll();
     }
-    pendingDeleteId = null;
-    confirmOverlay.hidden = true;
+    closeConfirmModal();
   });
 
   confirmOverlay.addEventListener("click", function (e) {
     if (e.target === confirmOverlay) {
-      pendingDeleteId = null;
-      confirmOverlay.hidden = true;
+      closeConfirmModal();
+    }
+  });
+
+  confirmOverlay.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      closeConfirmModal();
     }
   });
 

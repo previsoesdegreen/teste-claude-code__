@@ -114,6 +114,53 @@ Data: 2026-09-14
 - **Reteste pós-correção**: mesmo payload injetado novamente — `window.__xss` permaneceu `undefined` e o conteúdo apareceu como texto literal na célula (`cellText` = a string literal do payload, não executado).
 - **Regressão**: cadastro de projeto com datas normais (`01/01/2026`, `01/02/2026`) continuou exibindo corretamente formatado; suíte automatizada reexecutada com resultado `TEST_SUMMARY total=16 passed=16 failed=0`; nenhum erro de console.
 
+## Revisão de acessibilidade — Ciclo 6 (BKL-104: acessibilidade básica)
+
+Data: 2026-09-14
+
+### Achados encontrados
+
+1. **Contraste de cor abaixo do mínimo WCAG 2.1 AA (4.5:1 para texto normal)** — calculado programaticamente (fórmula de luminância relativa do WCAG), não estimado visualmente:
+
+   | Elemento | Antes | Depois |
+   |---|---|---|
+   | Texto `--muted` sobre `--surface` (labels, notas, cabeçalho de tabela, rodapé) — tema claro | 3.50:1 ❌ | 5.78:1 ✅ |
+   | Texto `--good` sobre `--surface` (KPI "Concluídos", mensagem de sucesso) — tema claro | 3.27:1 ❌ | 5.75:1 ✅ |
+   | Texto `--bad` sobre `--surface` (erros, KPI "Atrasados") — tema claro | 4.68:1 ✅ (já passava) | 5.65:1 ✅ |
+   | `.badge.planejado` (texto sobre fundo tingido) — ambos os temas | 2.90:1 (claro) / 4.12:1 (escuro) ❌ | 5.11:1 / 4.50:1 ✅ |
+   | `.badge.concluido` (texto sobre fundo tingido) — ambos os temas | 2.75:1 (claro) / 4.32:1 (escuro) ❌ | 5.01:1 / 4.50:1 ✅ |
+   | `.badge.andamento` (texto sobre fundo tingido) — ambos os temas | 3.56:1 (claro) / 4.10:1 (escuro) ❌ | 4.57:1 / 4.51:1 ✅ |
+   | `.badge.atrasado` (texto sobre fundo tingido) — ambos os temas | 3.78:1 (claro) / 4.75:1 (escuro) — claro falhava | 4.56:1 / 4.75:1 ✅ |
+   | `.eyebrow` sobre `--band` (tema claro) | 4.06:1 ❌ | 4.55:1 ✅ |
+   | Botão primário (`--accent-ink` sobre `--accent`) — tema claro | 4.42:1 ❌ (bem próximo do limite) | 4.55:1 ✅ |
+
+   Todos os pares no tema escuro que já passavam permaneceram inalterados e verificados novamente.
+
+2. **Campos de busca e filtro sem `<label>` associado** (`#f-search`, `#f-filter-status`) — dependiam apenas de `placeholder`, que não é um substituto confiável de rótulo para leitores de tela.
+3. **Modal de confirmação de exclusão sem semântica de diálogo** — faltavam `role="dialog"`, `aria-modal`, `aria-labelledby`/`aria-describedby`, e não havia gerenciamento de foco (o foco não entrava no modal ao abrir, `Esc` não fechava, e o foco não retornava ao botão que abriu o modal ao fechar).
+4. **Botões "Editar"/"Excluir" sem contexto para leitor de tela** — o nome acessível era apenas "Editar"/"Excluir", idêntico em todas as linhas da tabela, sem identificar a qual projeto se referiam.
+
+### Correções aplicadas
+
+- `css/styles.css`: valores de `--muted`, `--good`, `--bad` e `--accent` (tema claro) escurecidos ao mínimo necessário para 4.5:1; alpha de fundo de `.badge.planejado`/`.badge.concluido` reduzido de 0.18/0.15 para 0.12; novas variáveis dedicadas `--accent-badge` (texto do badge "Em andamento") e `--eyebrow-ink` (texto do `.eyebrow`) criadas — **sem alterar `--accent` usado em botões, bordas e foco fora do necessário** — para não haver conflito entre um mesmo token precisando de valores opostos em contextos diferentes (texto sobre fundo escuro vs. texto sobre fundo claro). Justificativa completa em `DECISIONS.md`.
+- `index.html`: `<label class="sr-only">` adicionado para `#f-search` e `#f-filter-status`; `role="dialog"`, `aria-modal="true"`, `aria-labelledby="confirm-title"`, `aria-describedby="confirm-text"` adicionados ao `.modal`; `id="confirm-title"` adicionado ao `<h3>`.
+- `css/styles.css`: utilitário `.sr-only` adicionado (padrão de rótulo visualmente oculto, mas acessível a leitores de tela).
+- `js/app.js`: `openConfirmModal()`/`closeConfirmModal()` — foco move para o botão "Cancelar" ao abrir o modal; tecla `Esc` fecha o modal; foco retorna ao botão que abriu o modal ao fechar (cancelar, confirmar ou clique fora). Botões "Editar"/"Excluir" passaram a ter `aria-label` incluindo o nome do projeto.
+
+### Validação real executada
+
+- Recalculados todos os pares de contraste acima após a mudança (script de verificação com a fórmula oficial do WCAG) — todos ≥ 4.5:1 em ambos os temas.
+- Testado no navegador: abrir modal move o foco para "Cancelar"; `Esc` fecha o modal e devolve o foco ao botão que o abriu; fluxo completo de exclusão (abrir → confirmar → item removido) continua funcionando.
+- Rótulos confirmados via `label[for]`/`aria-label` lidos diretamente do DOM renderizado.
+- Inspeção visual da tabela com os 4 status/badges simultaneamente — nenhuma mudança perceptível de layout, apenas leve escurecimento de cores já usadas.
+- Suíte automatizada reexecutada: `TEST_SUMMARY total=16 passed=16 failed=0` (duas execuções, antes e depois da adição do foco/ARIA).
+- Nenhum erro de console em nenhuma das verificações.
+
+### Pendência declarada (não bloqueante)
+
+- Não foi implementado *focus trap* completo (Tab/Shift+Tab ciclando somente dentro do modal enquanto aberto) — apenas movimentação de foco ao abrir/fechar e fechamento via `Esc`. Um usuário de teclado pode, em teoria, tabular para fora do modal enquanto ele está aberto. Registrado aqui para visibilidade; não bloqueia esta entrega por ser uma melhoria incremental sobre uma base já significativamente mais acessível que antes.
+- Não foi conduzida uma auditoria completa com leitor de tela real (NVDA/VoiceOver) nem uma verificação de todos os critérios WCAG 2.1 AA — o escopo desta revisão foi "básico" (labels, contraste, navegação por teclado), conforme `BKL-104`.
+
 ## Regressões conhecidas
 
-Nenhuma regressão identificada até o momento (2026-09-14, incluindo após os Ciclos 4 e 5). Este documento deve ser atualizado a cada novo ciclo de testes.
+Nenhuma regressão identificada até o momento (2026-09-14, incluindo após os Ciclos 4, 5 e 6). Este documento deve ser atualizado a cada novo ciclo de testes.
