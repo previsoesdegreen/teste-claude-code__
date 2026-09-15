@@ -77,3 +77,13 @@
 **Trade-off assumido**: a suíte cobre lógica de negócio pura (`effectiveStatus`, `validateProjectData`) e persistência (`ProjectStorage`), mas não cobre renderização de DOM/interação de usuário — isso continua coberto por testes manuais no navegador a cada incremento, registrados em `QA-REPORT.md`. Documentado como restrição conhecida em `ARCHITECTURE.md`.
 
 **Refatoração associada**: `js/app.js` teve a lógica de validação extraída para a função pura `validateProjectData(input)` (sem alterar nenhuma mensagem ou regra existente) e passou a expor `window.PainelProjetosCore = { effectiveStatus, validateProjectData }` somente para leitura pelos testes. Regressão completa executada após a mudança (ver `QA-REPORT.md`, Ciclo 4) confirmando comportamento idêntico ao anterior.
+
+---
+
+## 2026-09-14 — Correção de achado de segurança: datas sem escapeHtml() na tabela (BKL-105)
+
+**Decisão**: aplicar `escapeHtml()` também a `fmtDate(p.dataInicio)` e `fmtDate(p.prazo)` em `js/app.js`, que antes eram interpolados em `innerHTML` sem escaping (diferente de `nome`/`responsavel`, que já eram escapados).
+
+**Contexto/justificativa**: durante a revisão formal de segurança da Fase 2 (`BKL-105`), identificou-se que um valor malicioso de data — alcançável apenas adulterando o `localStorage` diretamente (fora da UI normal, que restringe o campo a `<input type="date">`) — seria renderizado sem escaping, permitindo um auto-XSS local. Comprovado com um payload `<img src=x onerror=...>` injetado via console: o `onerror` disparava antes da correção e deixou de disparar depois. Como o `escapeHtml()` é uma operação idempotente para os caracteres normais de uma data formatada (dígitos e `/`), a correção não altera a exibição em nenhum caso legítimo — confirmado por regressão manual e pela suíte automatizada (16/16).
+
+**Justificativa da severidade e não bloqueio de release**: o vetor exige que o próprio usuário edite manualmente seu próprio `localStorage`; não há terceiros nem servidor envolvidos nesta arquitetura, então o "atacante" só afetaria a si mesmo. Ainda assim, a correção foi aplicada por ser trivial, segura e não disruptiva — não há razão para deixar um XSS conhecido, mesmo de baixo impacto, sem correção.

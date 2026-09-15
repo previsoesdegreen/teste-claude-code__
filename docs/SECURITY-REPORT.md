@@ -34,9 +34,9 @@
 
 | Item | Situação |
 |------|----------|
-| Validação de campos obrigatórios | Implementada em `js/app.js` (`validate()`): nome, responsável, datas, status e progresso (0–100) são obrigatórios. |
+| Validação de campos obrigatórios | Implementada em `js/app.js` (`validateProjectData()`, extraída de `validate()` no incremento BKL-101): nome, responsável, datas, status e progresso (0–100) são obrigatórios. |
 | Validação de coerência de datas | Implementada: prazo não pode ser anterior à data de início. |
-| Sanitização contra XSS ao exibir dados na tabela | Implementada: função `escapeHtml()` usada ao renderizar nome e responsável na tabela, prevenindo injeção de HTML/script via esses campos. |
+| Sanitização contra XSS ao exibir dados na tabela | Implementada: função `escapeHtml()` usada ao renderizar nome e responsável na tabela. **Achado corrigido nesta revisão (BKL-105, 2026-09-14)**: as colunas de data (`fmtDate(p.dataInicio)`, `fmtDate(p.prazo)`) eram interpoladas em `innerHTML` sem `escapeHtml()`. Como esses campos só são preenchíveis via `<input type="date">` (o navegador restringe o formato), o risco prático era baixo — exigiria adulteração direta do `localStorage` pelo próprio usuário (auto-XSS local, sem impacto em terceiros nesta arquitetura single-user). Corrigido aplicando `escapeHtml()` também às datas formatadas. Validado no navegador injetando um payload `<img src=x onerror=...>` diretamente no `localStorage`: antes da correção o `onerror` executaria; depois, o conteúdo é exibido como texto literal. Regressão completa (cadastro, exibição de datas normais, suíte automatizada 16/16) confirmou nenhuma quebra. |
 | Validação de tipo/faixa numérica (progresso) | Implementada: valor numérico entre 0 e 100. |
 | Validação client-side vs. server-side | Como não há servidor, toda validação é client-side. Isso é aceitável apenas porque não há backend nem múltiplos usuários confiando nos mesmos dados — o próprio usuário só pode "atacar" seus próprios dados locais, sem impacto em terceiros. |
 

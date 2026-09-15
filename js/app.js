@@ -214,8 +214,8 @@
       tr.innerHTML =
         "<td>" + escapeHtml(p.nome) + "</td>" +
         "<td>" + escapeHtml(p.responsavel) + "</td>" +
-        "<td>" + fmtDate(p.dataInicio) + "</td>" +
-        "<td>" + fmtDate(p.prazo) + "</td>" +
+        "<td>" + escapeHtml(fmtDate(p.dataInicio)) + "</td>" +
+        "<td>" + escapeHtml(fmtDate(p.prazo)) + "</td>" +
         '<td><span class="badge ' + st + '">' + STATUS_LABEL[st] + "</span></td>" +
         '<td><div class="progress-cell"><span class="progress-bar"><span style="width:' + p.progresso + '%"></span></span>' + p.progresso + "%</div></td>" +
         '<td class="num"><div class="row-actions">' +

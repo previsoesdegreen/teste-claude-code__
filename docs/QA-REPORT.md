@@ -101,6 +101,19 @@ Executada na mesma sessão, contra `index.html` servido localmente, para confirm
 
 **Conclusão da regressão**: nenhuma funcionalidade existente foi afetada pela refatoração.
 
+## Testes de segurança — Ciclo 5 (BKL-105: revisão formal de segurança da Fase 2)
+
+Data: 2026-09-14
+
+### Bug de segurança encontrado e corrigido
+
+- **Descrição**: `fmtDate(p.dataInicio)` e `fmtDate(p.prazo)` eram interpolados em `innerHTML` na renderização da tabela sem passar por `escapeHtml()`, ao contrário de `nome`/`responsavel`.
+- **Severidade real**: baixa — os campos de data só são preenchíveis via `<input type="date">` na UI normal; explorar isso exige adulterar o `localStorage` diretamente (auto-XSS local, sem terceiros envolvidos nesta arquitetura single-user).
+- **Prova de conceito**: injetado no `localStorage`, via console do navegador, um projeto com `dataInicio: "<img src=x onerror=window.__xss=true>"`. Antes da correção, o handler `onerror` executaria ao renderizar a tabela.
+- **Correção**: `escapeHtml()` aplicado também às datas formatadas em `js/app.js`.
+- **Reteste pós-correção**: mesmo payload injetado novamente — `window.__xss` permaneceu `undefined` e o conteúdo apareceu como texto literal na célula (`cellText` = a string literal do payload, não executado).
+- **Regressão**: cadastro de projeto com datas normais (`01/01/2026`, `01/02/2026`) continuou exibindo corretamente formatado; suíte automatizada reexecutada com resultado `TEST_SUMMARY total=16 passed=16 failed=0`; nenhum erro de console.
+
 ## Regressões conhecidas
 
-Nenhuma regressão identificada até o momento (2026-09-14, incluindo após o Ciclo 4). Este documento deve ser atualizado a cada novo ciclo de testes.
+Nenhuma regressão identificada até o momento (2026-09-14, incluindo após os Ciclos 4 e 5). Este documento deve ser atualizado a cada novo ciclo de testes.
