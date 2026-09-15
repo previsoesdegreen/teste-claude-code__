@@ -3,7 +3,7 @@
 > Deve ser revisado antes de qualquer release (regra 19 do `CLAUDE.md`). Achados não devem ser ocultados; se um item não se aplica, isso é registrado explicitamente com o motivo.
 
 ## Data da última revisão
-2026-09-14 (revisado novamente após a adição da suíte de testes em `tests/` — BKL-101)
+2026-09-14 (revisões cumulativas: adição da suíte de testes em `tests/` — BKL-101; revisão formal de segurança — BKL-105, achado de XSS em datas corrigido; gate final de release — Ciclo 7 do `QA-REPORT.md`, sem novos achados desde BKL-105)
 
 ## 1. Dependências
 
@@ -68,5 +68,10 @@
 ## 8. Achados abertos / pendências de segurança
 
 - Nenhum achado crítico ou de alta severidade identificado até o momento.
+- Achado de baixa severidade (auto-XSS local via `localStorage` adulterado nas colunas de data) foi encontrado e **corrigido** em 2026-09-14 (BKL-105) — ver histórico acima e `QA-REPORT.md`/`DECISIONS.md`.
 - Pendência de melhoria (baixa prioridade): considerar CSP básica caso o projeto passe a carregar conteúdo de fontes menos controladas.
 - Este relatório deve ser revisitado sempre que uma nova integração externa, autenticação ou dado sensível for adicionado ao escopo (ver `PROJECT-SPEC.md`).
+
+## 9. Gate final — confirmação de release (Ciclo 7)
+
+Revisão completa deste checklist reexecutada em 2026-09-14 ao final da execução autônoma das Fases 0–2: nenhum item novo pendente, nenhum segredo/credencial encontrado em nenhum arquivo do repositório (incluindo os novos arquivos de `tests/` e as alterações de `js/app.js`/`css/styles.css`/`index.html`), e o único achado real (XSS de baixa severidade) está corrigido e validado. Aprovado para o gate de release deste escopo — ver `RELEASE-CHECKLIST.md`.

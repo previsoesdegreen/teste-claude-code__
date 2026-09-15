@@ -70,4 +70,52 @@ Data de referência: 2026-09-14
 
 ### 2. Decisão
 
-**AGUARDANDO** — estrutura de governança criada e validada como coerente, mas o commit não foi realizado nesta etapa por instrução explícita do usuário ("NÃO faça commit ainda"). Esta release só deve ser considerada `CONCLUIDO` no `BACKLOG.md` (BKL-015, BKL-016) após o commit correspondente.
+**CONCLUÍDA** — commitada em `b47f2ea` (chore: add autonomous development governance) e enviada a `origin/main`. `BKL-015`/`BKL-016` atualizados para `CONCLUIDO` em commit posterior (`cb1aa09`) assim que a evidência do commit/push foi confirmada.
+
+---
+
+## Release: v0.3 — Consolidação de qualidade (Fase 2) e execução autônoma do backlog
+
+Data de referência: 2026-09-14
+
+### 1. Critérios obrigatórios
+
+| Critério | Atendido? | Evidência |
+|----------|-----------|-----------|
+| Todo o backlog acionável (sem bloqueio de autorização externa) está `CONCLUIDO` | ✅ Sim | `BKL-001` a `BKL-016`, `BKL-101`, `BKL-104`, `BKL-105` — todos `CONCLUIDO` em `BACKLOG.md` |
+| Suíte de testes automatizados criada e executada (`BKL-101`) | ✅ Sim | 16/16 testes passaram — `QA-REPORT.md`, Ciclo 4 |
+| Revisão formal de segurança executada (`BKL-105`) | ✅ Sim | 1 achado (XSS de baixa severidade em datas) encontrado e corrigido — `QA-REPORT.md`, Ciclo 5; `SECURITY-REPORT.md` |
+| Revisão de acessibilidade básica executada (`BKL-104`) | ✅ Sim | 9 pares de contraste corrigidos (WCAG AA ≥4.5:1), labels e semântica de diálogo adicionados — `QA-REPORT.md`, Ciclo 6 |
+| Todos os bugs encontrados foram corrigidos e retestados | ✅ Sim | Bug de XSS (Ciclo 5) e todos os achados de contraste (Ciclo 6) corrigidos e revalidados |
+| Teste de regressão executado após cada correção | ✅ Sim | Regressão manual + suíte automatizada reexecutada em cada incremento (Ciclos 4–7) |
+| Gate final completo executado (testes, regressão, navegador, console, segurança) | ✅ Sim | `QA-REPORT.md`, Ciclo 7 |
+| Nenhum segredo, token, senha ou `.env` versionado | ✅ Sim | Verificado em cada commit (`git diff` + grep de padrões de segredo) antes de cada push |
+| README/documentação de governança atualizados | ✅ Sim | `BACKLOG.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `QA-REPORT.md`, `SECURITY-REPORT.md` atualizados a cada incremento |
+| Projeto executável ao final do ciclo | ✅ Sim | Validado servindo os arquivos localmente e testando fluxo completo no navegador (Ciclo 7) |
+
+### 2. Critérios de build
+
+| Critério | Atendido? | Observação |
+|----------|-----------|-----------|
+| Build executado | Não aplicável | Projeto não possui etapa de build (HTML/CSS/JS estático); confirmado nesta revisão |
+
+### 3. Critérios de versionamento
+
+| Critério | Atendido? | Evidência |
+|----------|-----------|-----------|
+| Commits pequenos e coerentes por incremento validado | ✅ Sim | `bc4fc80` (BKL-101), `15cfa70` (BKL-105), `bece42f` (BKL-104), além dos commits de correção de governança |
+| Branch principal é `main` | ✅ Sim | Confirmado via `git branch --show-current` |
+| Sem force push | ✅ Sim | Nenhum force push utilizado |
+| `main` local sincronizado com `origin/main` após cada push | ✅ Sim | Confirmado (`git rev-parse main` == `git rev-parse origin/main`) após cada um dos commits acima |
+
+### 4. Escopo intencionalmente fora deste release (bloqueado por autorização, não por falha)
+
+Estes itens permanecem `PENDENTE` no `BACKLOG.md` — não por incapacidade técnica, mas porque o próprio `PROJECT-SPEC.md` ("Fora de escopo nesta fase") e o `ROADMAP.md` (Fases 3 e 4) exigem decisão explícita do usuário antes de iniciar:
+
+- `BKL-100` — Exportação de dados (CSV/Excel): fora de escopo do produto atual até ser formalmente adicionado ao `PROJECT-SPEC.md`.
+- `BKL-102` — CI via GitHub Actions: Fase 4, requer autorização explícita (regra 26 do `CLAUDE.md` cobre deploy; a criação de CI em si não é destrutiva, mas o `ROADMAP.md` já classifica toda a Fase 4 como dependente de autorização).
+- `BKL-103` — Deploy em ambiente público: requer autorização explícita (regra 26 do `CLAUDE.md`) — bloqueio de decisão do usuário, não de qualidade técnica.
+
+### 5. Decisão
+
+**PRONTA para o escopo definido em `PROJECT-SPEC.md`/`ROADMAP.md` (Fases 0, 1 e 2).** Todos os critérios obrigatórios foram atendidos com evidência real. As pendências da seção 4 são conhecidas, explicitamente visíveis e bloqueadas exclusivamente por exigirem uma decisão do usuário — não representam um critério de qualidade não atendido.

@@ -161,6 +161,39 @@ Data: 2026-09-14
 - Não foi implementado *focus trap* completo (Tab/Shift+Tab ciclando somente dentro do modal enquanto aberto) — apenas movimentação de foco ao abrir/fechar e fechamento via `Esc`. Um usuário de teclado pode, em teoria, tabular para fora do modal enquanto ele está aberto. Registrado aqui para visibilidade; não bloqueia esta entrega por ser uma melhoria incremental sobre uma base já significativamente mais acessível que antes.
 - Não foi conduzida uma auditoria completa com leitor de tela real (NVDA/VoiceOver) nem uma verificação de todos os critérios WCAG 2.1 AA — o escopo desta revisão foi "básico" (labels, contraste, navegação por teclado), conforme `BKL-104`.
 
+## Gate final — Ciclo 7 (fim da execução autônoma da Fase 2)
+
+Data: 2026-09-14
+
+Executado como fechamento do ciclo de execução autônoma do backlog (Fases 0–2), após BKL-101/BKL-105/BKL-104:
+
+| Verificação | Resultado |
+|---|---|
+| Suíte automatizada (`tests/tests.html`) | `TEST_SUMMARY total=16 passed=16 failed=0` |
+| Fluxo completo end-to-end no navegador (validação vazia, cadastro com atrasado, cadastro concluído, KPIs, busca, filtro, edição sem duplicar, tema, exclusão com cancelar e com confirmar) | Todos os passos com resultado esperado — ver detalhes abaixo |
+| Erros de console durante todo o ciclo | Nenhum |
+| Layout mobile (375×812) | Íntegro, sem artefatos, estado de dados consistente com `ProjectStorage.list()` |
+| Build | Não aplicável — projeto sem etapa de build (confirmado nesta revisão) |
+
+Detalhe do fluxo end-to-end (script único, execução real no navegador):
+```
+initialCount: 0
+emptySubmitErrors: 5 (nome, responsável, início, prazo, progresso — status não conta pois o formulário abre com "Em andamento" pré-selecionado, comportamento original preservado)
+emptySubmitCreated: 0
+createdA / createdB: true / true
+kpis: [2, 0, 1, 1]  (total, em andamento, concluídos, atrasados)
+searchRows (busca "Ciclana"): 1
+filterAtrasadoRows: 1
+countAfterEdit: 2 (sem duplicar)
+editedName: "Gate Final B (editado)"
+themeToggled: true
+existsAfterCancel: true (cancelar não excluiu)
+existsAfterConfirm: false (confirmar excluiu)
+finalCount: 0 (limpeza pós-teste)
+```
+
+**Conclusão**: nenhuma falha encontrada neste ciclo de fechamento. Todas as funcionalidades de `PROJECT-SPEC.md` (RF-01 a RF-11) permanecem íntegras após os incrementos de testes automatizados, segurança e acessibilidade.
+
 ## Regressões conhecidas
 
-Nenhuma regressão identificada até o momento (2026-09-14, incluindo após os Ciclos 4, 5 e 6). Este documento deve ser atualizado a cada novo ciclo de testes.
+Nenhuma regressão identificada até o momento (2026-09-14, incluindo após os Ciclos 4, 5, 6 e 7). Este documento deve ser atualizado a cada novo ciclo de testes.
