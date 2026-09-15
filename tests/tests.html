@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Testes automatizados — Painel de Projetos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; background:#f4f5f2; color:#0b0e11; margin:0; padding:24px; }
+  h1 { font-size:20px; }
+  #summary { font-family: ui-monospace, monospace; font-size:14px; margin:16px 0; padding:12px; border-radius:8px; }
+  #summary.pass { background:#e6f7e6; color:#0ca30c; }
+  #summary.fail { background:#fdeaea; color:#d03b3b; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { padding:8px 10px; border-bottom:1px solid #e1e0d9; font-size:13.5px; }
+  li.pass::before { content:"✅ "; }
+  li.fail::before { content:"❌ "; }
+  li.fail { color:#d03b3b; }
+  .error-detail { font-family: ui-monospace, monospace; font-size:12px; color:#a33; margin-top:4px; }
+  iframe { display:none; }
+</style>
+</head>
+<body>
+  <h1>Testes automatizados — Painel de Projetos (BKL-101)</h1>
+  <p>Executa contra a aplicação real (<code>../index.html</code>) carregada em um iframe oculto. O <code>localStorage</code> é restaurado ao estado anterior após a execução.</p>
+  <div id="summary">Executando…</div>
+  <ul id="result-list"></ul>
+
+  <iframe id="app-frame" src="../index.html"></iframe>
+
+  <script src="test-runner.js"></script>
+  <script src="test-cases.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var frame = document.getElementById("app-frame");
+    var summaryEl = document.getElementById("summary");
+    var listEl = document.getElementById("result-list");
+
+    function render(summary) {
+      summaryEl.textContent = summary.passed + "/" + summary.total + " testes passaram" + (summary.failed > 0 ? " — " + summary.failed + " falharam" : "");
+      summaryEl.className = summary.failed === 0 ? "pass" : "fail";
+
+      summary.results.forEach(function (r) {
+        var li = document.createElement("li");
+        li.className = r.pass ? "pass" : "fail";
+        li.textContent = r.name;
+        if (!r.pass) {
+          var detail = document.createElement("div");
+          detail.className = "error-detail";
+          detail.textContent = r.error;
+          li.appendChild(detail);
+        }
+        listEl.appendChild(li);
+      });
+
+      // Linha única e estável para leitura automatizada via console (QA/CI).
+      console.log("TEST_SUMMARY total=" + summary.total + " passed=" + summary.passed + " failed=" + summary.failed);
+      summary.results.forEach(function (r) {
+        if (!r.pass) console.error("TEST_FAILED: " + r.name + " :: " + r.error);
+      });
+    }
+
+    frame.addEventListener("load", function () {
+      var appWindow = frame.contentWindow;
+      var STORAGE_KEY = "painel-projetos:v1";
+      var backup = appWindow.localStorage.getItem(STORAGE_KEY);
+      try {
+        var summary = runAllTests(appWindow);
+        render(summary);
+      } catch (e) {
+        summaryEl.textContent = "Erro ao executar a suíte: " + e.message;
+        summaryEl.className = "fail";
+        console.error("TEST_SUITE_ERROR: " + e.message);
+      } finally {
+        // Restaura o localStorage exatamente ao estado anterior à execução dos testes, para não afetar dados reais do usuário.
+        if (backup === null) {
+          appWindow.localStorage.removeItem(STORAGE_KEY);
+        } else {
+          appWindow.localStorage.setItem(STORAGE_KEY, backup);
+        }
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -58,7 +58,7 @@ EM_TESTE → FALHOU_TESTE → EM_DESENVOLVIMENTO → IMPLEMENTADO → EM_TESTE
 | ID | Módulo | Descrição | Dependências | Prioridade | Status | Evidência de conclusão |
 |----|--------|-----------|---------------|------------|--------|--------------------------|
 | BKL-100 | Exportação | Exportar lista de projetos em CSV/Excel | BKL-003 | Baixa | PENDENTE | — |
-| BKL-101 | Testes | Suíte de testes automatizados para regras críticas (status atrasado, validação) | BKL-006, BKL-002 | Média | PENDENTE | — |
+| BKL-101 | Testes | Suíte de testes automatizados para regras críticas (status atrasado, validação, CRUD de persistência) | BKL-006, BKL-002 | Média | CONCLUIDO | 16/16 testes passaram na primeira execução real no navegador (`TEST_SUMMARY total=16 passed=16 failed=0`); regressão manual da aplicação real (cadastro, atrasado automático, edição, exclusão, KPIs) sem falhas e sem erros de console — ver `QA-REPORT.md`, Ciclo 4 |
 | BKL-102 | Infra | CI (lint/testes/build) via GitHub Actions | BKL-014 | Baixa | PENDENTE | — |
 | BKL-103 | Deploy | Publicação em ambiente público (ex.: GitHub Pages) | BKL-014 | Baixa | PENDENTE | Requer autorização explícita do usuário (regra 26 do CLAUDE.md) |
 

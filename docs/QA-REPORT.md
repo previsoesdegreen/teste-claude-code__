@@ -10,8 +10,7 @@
 
 ## Testes automatizados
 
-**Status: NÃO EXECUTADO.**
-**Motivo**: não existe suíte de testes automatizados implementada no projeto até o momento. Nenhum resultado de teste automatizado deve ser considerado existente até que `BKL-101` seja implementado.
+**Status: EXECUTADO (a partir de 2026-09-14, Ciclo 4).** Ver detalhes abaixo. Antes deste ciclo, nenhuma suíte automatizada existia (`BKL-101` estava `PENDENTE`).
 
 ## Testes funcionais manuais — Ciclo 1 (build inicial da aplicação)
 
@@ -61,6 +60,47 @@ Data: 2026-09-14
 **Status: NÃO EXECUTADO.**
 **Motivo**: esta etapa não alterou `index.html`, `css/styles.css`, `js/app.js` ou `js/storage.js` — apenas arquivos de documentação (`/docs/*.md`) e `CLAUDE.md` foram criados/alterados. Não há comportamento de aplicação novo a validar no navegador. Validação funcional completa (Ciclo 1/2) permanece válida, pois o código de aplicação não foi tocado.
 
+## Testes funcionais e automatizados — Ciclo 4 (BKL-101: suíte de testes automatizados)
+
+Data: 2026-09-14
+
+### Contexto
+
+Implementação de `BKL-101` (Fase 2 do roadmap). Como o ambiente não possui Node/npm (reconfirmado nesta etapa), não é viável usar um test runner de mercado (Jest/Vitest/etc.). Foi construído um harness próprio, sem dependências externas, coerente com a decisão arquitetural de "sem build/sem framework" (ver `DECISIONS.md`). Os testes rodam num navegador real, carregando a aplicação de verdade dentro de um iframe (`tests/tests.html` → `../index.html`) — nenhuma implementação foi mockada.
+
+Para viabilizar os testes, `js/app.js` foi refatorado (sem alterar comportamento): a lógica de validação foi extraída para uma função pura `validateProjectData(input)`, e `effectiveStatus`/`validateProjectData` foram expostas em `window.PainelProjetosCore` somente para leitura pelos testes.
+
+### Suíte automatizada — resultado real
+
+Executada servindo o projeto via servidor HTTP local temporário e abrindo `tests/tests.html` num navegador real (Claude Browser pane).
+
+```
+TEST_SUMMARY total=16 passed=16 failed=0
+```
+
+| Grupo | Casos | Resultado |
+|-------|-------|-----------|
+| `effectiveStatus` (cálculo de "Atrasado") | 5 | ✅ 5/5 |
+| `validateProjectData` (validação de formulário) | 6 | ✅ 6/6 |
+| `ProjectStorage` (CRUD em `localStorage`) | 5 | ✅ 5/5 |
+
+Nenhuma falha na primeira execução — não houve necessidade de ciclo de correção para este incremento.
+
+### Regressão manual da aplicação real (pós-refatoração de `js/app.js`)
+
+Executada na mesma sessão, contra `index.html` servido localmente, para confirmar que a refatoração de `validate()` não alterou o comportamento observável:
+
+| # | Cenário | Resultado |
+|---|---------|-----------|
+| 1 | Submissão de formulário vazio | ✅ 4 mensagens de erro exibidas (nome, responsável, início, prazo); nenhum projeto criado |
+| 2 | Cadastro com prazo anterior ao início | ✅ Bloqueado com a mensagem correta; nenhum projeto criado |
+| 3 | Cadastro válido (prazo no passado, status "Em andamento") | ✅ Projeto criado; KPI "Atrasados" = 1; badge "Atrasado" exibido na tabela |
+| 4 | Edição do projeto (status → "Concluído", progresso → 100) | ✅ Atualizado sem duplicar registro (`list().length` permaneceu 1) |
+| 5 | Exclusão com modal de confirmação | ✅ Modal visível ao abrir; projeto removido após confirmar |
+| 6 | Erros de console durante todo o ciclo | ✅ Nenhum erro |
+
+**Conclusão da regressão**: nenhuma funcionalidade existente foi afetada pela refatoração.
+
 ## Regressões conhecidas
 
-Nenhuma regressão identificada até o momento (2026-09-14). Este documento deve ser atualizado a cada novo ciclo de testes.
+Nenhuma regressão identificada até o momento (2026-09-14, incluindo após o Ciclo 4). Este documento deve ser atualizado a cada novo ciclo de testes.

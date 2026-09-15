@@ -3,7 +3,7 @@
 > Deve ser revisado antes de qualquer release (regra 19 do `CLAUDE.md`). Achados não devem ser ocultados; se um item não se aplica, isso é registrado explicitamente com o motivo.
 
 ## Data da última revisão
-2026-09-14
+2026-09-14 (revisado novamente após a adição da suíte de testes em `tests/` — BKL-101)
 
 ## 1. Dependências
 
@@ -56,7 +56,16 @@
 | Content Security Policy (CSP) | Não configurada. Baixo risco no escopo atual (sem scripts de terceiros, sem entrada de dados executável), mas é uma melhoria recomendada caso o projeto evolua para aceitar conteúdo externo. |
 | Verificação de segredos versionados no Git (`git log`/`git diff` antes de commit/push) | Executada manualmente antes do primeiro commit — nenhum arquivo sensível foi incluído (ver histórico de `git status` no commit inicial). |
 
-## 7. Achados abertos / pendências de segurança
+## 7. Revisão da suíte de testes (`tests/`, BKL-101)
+
+| Item | Situação |
+|------|----------|
+| Novas dependências de terceiros | Nenhuma — `tests/test-runner.js` é um micro-framework próprio, sem bibliotecas externas. |
+| Uso de `eval`/`Function`/injeção de HTML não sanitizado | Nenhum encontrado — resultados são renderizados via `textContent`, nunca `innerHTML` com dado dinâmico. |
+| Exposição de superfície nova na aplicação em produção | `window.PainelProjetosCore` é adicionado por `js/app.js` e fica acessível em qualquer página que carregue o script — expõe apenas funções puras de leitura (`effectiveStatus`, `validateProjectData`), sem acesso a dados privados adicionais além do que `ProjectStorage` já expunha publicamente. Risco considerado desprezível: não introduz novo vetor de leitura/escrita de dados. |
+| Isolamento dos dados reais do usuário durante os testes | A suíte executa contra o `localStorage` real (mesma origem), mas faz backup do valor da chave `painel-projetos:v1` antes de rodar e o restaura no `finally`, independentemente de sucesso ou falha — mitigação intencional documentada em `DECISIONS.md`/`ARCHITECTURE.md`. |
+
+## 8. Achados abertos / pendências de segurança
 
 - Nenhum achado crítico ou de alta severidade identificado até o momento.
 - Pendência de melhoria (baixa prioridade): considerar CSP básica caso o projeto passe a carregar conteúdo de fontes menos controladas.

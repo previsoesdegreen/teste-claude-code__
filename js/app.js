@@ -77,31 +77,59 @@
     if (errEl) errEl.textContent = message;
   }
 
+  var VALIDATION_FIELD_IDS = {
+    nome: "f-nome",
+    responsavel: "f-responsavel",
+    dataInicio: "f-inicio",
+    prazo: "f-prazo",
+    progresso: "f-progresso",
+    status: "f-status"
+  };
+
+  /* Regra de negócio pura (sem DOM) — testável isoladamente em /tests. */
+  function validateProjectData(input) {
+    var errors = {};
+    var nome = (input.nome || "").trim();
+    var responsavel = (input.responsavel || "").trim();
+    var inicio = input.dataInicio || "";
+    var prazo = input.prazo || "";
+    var status = input.status || "";
+    var progresso = input.progresso;
+
+    if (!nome) errors.nome = "Informe o nome do projeto.";
+    if (!responsavel) errors.responsavel = "Informe o responsável.";
+    if (!inicio) errors.dataInicio = "Informe a data de início.";
+    if (!prazo) errors.prazo = "Informe o prazo.";
+    if (inicio && prazo && prazo < inicio) {
+      errors.prazo = "O prazo não pode ser anterior ao início.";
+    }
+    if (progresso === "" || progresso === undefined || progresso === null || isNaN(progresso) || Number(progresso) < 0 || Number(progresso) > 100) {
+      errors.progresso = "Progresso deve ser um número entre 0 e 100.";
+    }
+    if (!status) errors.status = "Selecione um status.";
+
+    var valid = Object.keys(errors).length === 0;
+    return {
+      valid: valid,
+      errors: errors,
+      data: valid ? { nome: nome, responsavel: responsavel, dataInicio: inicio, prazo: prazo, status: status, progresso: Number(progresso) } : null
+    };
+  }
+
   function validate() {
     clearFieldErrors();
-    var ok = true;
-    var nome = fNome.value.trim();
-    var responsavel = fResponsavel.value.trim();
-    var inicio = fInicio.value;
-    var prazo = fPrazo.value;
-    var status = fStatus.value;
-    var progresso = fProgresso.value;
-
-    if (!nome) { setFieldError("f-nome", "Informe o nome do projeto."); ok = false; }
-    if (!responsavel) { setFieldError("f-responsavel", "Informe o responsável."); ok = false; }
-    if (!inicio) { setFieldError("f-inicio", "Informe a data de início."); ok = false; }
-    if (!prazo) { setFieldError("f-prazo", "Informe o prazo."); ok = false; }
-    if (inicio && prazo && prazo < inicio) {
-      setFieldError("f-prazo", "O prazo não pode ser anterior ao início.");
-      ok = false;
-    }
-    if (progresso === "" || isNaN(progresso) || Number(progresso) < 0 || Number(progresso) > 100) {
-      setFieldError("f-progresso", "Progresso deve ser um número entre 0 e 100.");
-      ok = false;
-    }
-    if (!status) { setFieldError("f-status", "Selecione um status."); ok = false; }
-
-    return ok ? { nome: nome, responsavel: responsavel, dataInicio: inicio, prazo: prazo, status: status, progresso: Number(progresso) } : null;
+    var result = validateProjectData({
+      nome: fNome.value,
+      responsavel: fResponsavel.value,
+      dataInicio: fInicio.value,
+      prazo: fPrazo.value,
+      status: fStatus.value,
+      progresso: fProgresso.value
+    });
+    Object.keys(result.errors).forEach(function (field) {
+      setFieldError(VALIDATION_FIELD_IDS[field], result.errors[field]);
+    });
+    return result.data;
   }
 
   function resetForm() {
@@ -295,4 +323,10 @@
   document.getElementById("meta-date").textContent = fmtDate(todayISO());
   resetForm();
   renderAll();
+
+  /* Exposição somente-leitura das regras de negócio puras para a suíte de testes em /tests. Não afeta o comportamento da aplicação. */
+  window.PainelProjetosCore = {
+    effectiveStatus: effectiveStatus,
+    validateProjectData: validateProjectData
+  };
 })();

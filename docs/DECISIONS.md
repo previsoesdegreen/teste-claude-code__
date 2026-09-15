@@ -65,3 +65,15 @@
 **Decisão**: durante o início da execução autônoma do backlog, identificou-se que `BKL-015` e `BKL-016` permaneciam registrados como `EM_DESENVOLVIMENTO` ("ainda não commitado"), embora o commit `b47f2ea` já os tivesse implementado, revisado e publicado em `origin/main` em etapa anterior. Os dois itens foram avançados para `CONCLUIDO` com evidência real (hash do commit + confirmação de sincronismo local/remoto), e `ROADMAP.md` (Fase 1) foi atualizado de "em andamento" para "concluída". Também foram criados `BKL-104` (revisão de acessibilidade básica) e `BKL-105` (revisão formal de segurança da Fase 2), convertendo formalmente o escopo textual já existente em `ROADMAP.md` (Fase 2) em itens rastreáveis com ID, conforme regra 3 da governança.
 
 **Justificativa**: o `BACKLOG.md` é a fonte de verdade sobre o estado real do trabalho; mantê-lo desatualizado violaria a regra de consistência entre documentos e poderia levar a reexecutar ou pular trabalho já validado. Nenhum estado foi avançado sem evidência — a evidência já existia (commit e push confirmados na etapa anterior), apenas não havia sido refletida no arquivo.
+
+---
+
+## 2026-09-14 — Suíte de testes automatizados sem dependências externas (BKL-101)
+
+**Decisão**: implementar os testes automatizados de `BKL-101` como um harness próprio em `tests/` (micro-framework de asserções + casos de teste + página HTML que carrega a aplicação real num iframe), em vez de usar um test runner de mercado (Jest, Vitest, Mocha, etc.).
+
+**Justificativa**: o ambiente de desenvolvimento não possui Node.js/npm instalados (reconfirmado nesta etapa); instalar um runtime ou baixar dependências npm não estava disponível nem seria coerente com a decisão arquitetural vigente de "sem build/sem framework" (ver decisão de 2026-09-14 sobre arquitetura client-side). Um harness próprio, em JavaScript puro, mantém o projeto 100% executável apenas com um navegador, sem exigir instalação de ferramentas adicionais — o mesmo princípio já aplicado ao restante da aplicação.
+
+**Trade-off assumido**: a suíte cobre lógica de negócio pura (`effectiveStatus`, `validateProjectData`) e persistência (`ProjectStorage`), mas não cobre renderização de DOM/interação de usuário — isso continua coberto por testes manuais no navegador a cada incremento, registrados em `QA-REPORT.md`. Documentado como restrição conhecida em `ARCHITECTURE.md`.
+
+**Refatoração associada**: `js/app.js` teve a lógica de validação extraída para a função pura `validateProjectData(input)` (sem alterar nenhuma mensagem ou regra existente) e passou a expor `window.PainelProjetosCore = { effectiveStatus, validateProjectData }` somente para leitura pelos testes. Regressão completa executada após a mudança (ver `QA-REPORT.md`, Ciclo 4) confirmando comportamento idêntico ao anterior.

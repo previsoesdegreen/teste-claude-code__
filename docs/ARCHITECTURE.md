@@ -47,6 +47,12 @@ Camada de aplicação:
 ### `index.html`
 Estrutura única contendo: cabeçalho (band), KPIs, formulário de cadastro/edição, toolbar de busca/filtro, tabela de projetos, modal de confirmação e toast de feedback.
 
+### `tests/` — suíte de testes automatizados (`BKL-101`)
+- `tests/test-runner.js` — micro-framework de asserções sem dependências externas (`test`, `assertEqual`, `assertTrue`, `assertFalse`, `summary`).
+- `tests/test-cases.js` — casos de teste para `effectiveStatus`, `validateProjectData` e `ProjectStorage` (CRUD).
+- `tests/tests.html` — página que carrega a aplicação real num `<iframe>` oculto (`../index.html`), executa a suíte contra `window.PainelProjetosCore`/`window.ProjectStorage` do iframe, faz backup/restauração do `localStorage` (para não afetar dados reais do usuário) e imprime um resumo estável no console (`TEST_SUMMARY total=N passed=N failed=N`) para leitura automatizada.
+- `js/app.js` expõe `window.PainelProjetosCore = { effectiveStatus, validateProjectData }` apenas para leitura pelos testes — não altera nenhum comportamento da aplicação.
+
 ## 4. Integrações externas
 
 | Integração | Finalidade | Dado enviado |
@@ -68,6 +74,10 @@ Nenhuma outra integração externa (sem APIs de terceiros, sem analytics, sem te
 ├── js/
 │   ├── storage.js
 │   └── app.js
+├── tests/
+│   ├── test-runner.js
+│   ├── test-cases.js
+│   └── tests.html
 └── docs/
     ├── PROJECT-SPEC.md
     ├── ROADMAP.md
@@ -85,9 +95,10 @@ Nenhuma outra integração externa (sem APIs de terceiros, sem analytics, sem te
 2. **`localStorage` como única persistência**: adequado ao escopo de teste/uso local single-user; limitação conhecida e documentada (dados não sincronizam entre navegadores/dispositivos).
 3. **Status "Atrasado" como valor derivado, não armazenado**: evita inconsistência entre o campo salvo e a passagem do tempo — recalculado a cada renderização a partir da data do sistema.
 4. **Separação `storage.js` / `app.js`**: mantém a camada de persistência isolada da camada de apresentação, facilitando uma futura troca de mecanismo de persistência sem reescrever a lógica de UI.
+5. **Regras de negócio extraídas como funções puras (`validateProjectData`, `effectiveStatus`)**: permitem testar a lógica crítica isoladamente do DOM, sem exigir framework de testes ou build. Ver `DECISIONS.md`.
 
 ## 7. Restrições atuais conhecidas
 
 - Sem autenticação/autorização (não há usuários distintos).
 - Sem API HTTP própria — nada a versionar como contrato de API nesta fase.
-- Sem testes automatizados ainda (ver `BKL-101` em [BACKLOG.md](BACKLOG.md)).
+- Testes automatizados cobrem as regras de negócio críticas (status "Atrasado", validação de formulário, CRUD de persistência) — ver `tests/` e `BKL-101` em [BACKLOG.md](BACKLOG.md). Não cobrem renderização de UI/DOM (KPIs, tabela) nem interações de usuário (cliques, digitação) — essas continuam validadas manualmente no navegador a cada incremento (ver [QA-REPORT.md](QA-REPORT.md)).
