@@ -1,0 +1,31 @@
+# Dependências (caso ferramentas de build sejam adicionadas no futuro)
+node_modules/
+package-lock.json
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credentials*
+*secret*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Arquivos temporários e de sistema
+*.tmp
+*.temp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores/IDEs
+.vscode/
+.idea/
+*.swp
+
+# Servidores/scripts de teste local (não fazem parte da aplicação)
+serve.ps1

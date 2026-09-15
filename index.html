@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Projetos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="band">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Gestão de Projetos</p>
+      <h1>Painel de Projetos</h1>
+      <p class="sub">Cadastro, acompanhamento e controle de status dos projetos em andamento.</p>
+    </div>
+    <div class="band-meta">
+      <span>Atualizado em <strong id="meta-date">—</strong></span>
+      <button id="btn-theme" class="btn-ghost" type="button" title="Alternar tema">🌓 Tema</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="kpis" id="kpi-row"></div>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <h2 id="form-title">Novo projeto</h2>
+        <p>Preencha os dados do projeto e clique em salvar.</p>
+      </div>
+    </div>
+    <div class="card">
+      <form id="project-form" novalidate>
+        <input type="hidden" id="project-id">
+        <div class="form-grid">
+          <div class="field">
+            <label for="f-nome">Nome do projeto *</label>
+            <input type="text" id="f-nome" maxlength="120" required placeholder="Ex.: Migração do sistema X">
+            <span class="error" data-for="f-nome"></span>
+          </div>
+          <div class="field">
+            <label for="f-responsavel">Responsável *</label>
+            <input type="text" id="f-responsavel" maxlength="80" required placeholder="Ex.: Maria Silva">
+            <span class="error" data-for="f-responsavel"></span>
+          </div>
+          <div class="field">
+            <label for="f-inicio">Data de início *</label>
+            <input type="date" id="f-inicio" required>
+            <span class="error" data-for="f-inicio"></span>
+          </div>
+          <div class="field">
+            <label for="f-prazo">Prazo *</label>
+            <input type="date" id="f-prazo" required>
+            <span class="error" data-for="f-prazo"></span>
+          </div>
+          <div class="field">
+            <label for="f-status">Status *</label>
+            <select id="f-status" required>
+              <option value="planejado">Planejado</option>
+              <option value="andamento" selected>Em andamento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+            <span class="error" data-for="f-status"></span>
+          </div>
+          <div class="field">
+            <label for="f-progresso">Progresso (%) *</label>
+            <input type="number" id="f-progresso" min="0" max="100" step="1" value="0" required>
+            <span class="error" data-for="f-progresso"></span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="btn-submit">Salvar projeto</button>
+          <button type="button" class="btn-secondary" id="btn-cancel" hidden>Cancelar edição</button>
+          <span class="form-msg" id="form-msg"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div>
+        <h2>Projetos cadastrados</h2>
+        <p>Lista de todos os projetos, com opções de edição e exclusão.</p>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="f-search" placeholder="Buscar por nome ou responsável…">
+        <select id="f-filter-status">
+          <option value="">Todos os status</option>
+          <option value="planejado">Planejado</option>
+          <option value="andamento">Em andamento</option>
+          <option value="concluido">Concluído</option>
+          <option value="atrasado">Atrasado</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data-table" id="table-projects">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Responsável</th>
+              <th>Início</th>
+              <th>Prazo</th>
+              <th>Status</th>
+              <th>Progresso</th>
+              <th class="num">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <p class="empty-state" id="empty-state" hidden>Nenhum projeto cadastrado ainda. Use o formulário acima para começar.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Painel de Projetos — dados armazenados localmente no navegador (localStorage)</span>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="confirm-overlay" hidden>
+  <div class="modal">
+    <h3>Excluir projeto</h3>
+    <p id="confirm-text">Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="confirm-cancel">Cancelar</button>
+      <button type="button" class="btn-danger" id="confirm-ok">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
