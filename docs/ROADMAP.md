@@ -15,7 +15,7 @@ Escopo: MVP funcional do Painel de Projetos.
 
 **Status**: concluída e validada manualmente no navegador (ver histórico de testes em [QA-REPORT.md](QA-REPORT.md)).
 
-## Fase 1 — Governança de desenvolvimento (em andamento)
+## Fase 1 — Governança de desenvolvimento (concluída)
 
 Escopo: estrutura de documentação e regras de processo para permitir evolução autônoma e rastreável do projeto.
 
@@ -23,7 +23,7 @@ Escopo: estrutura de documentação e regras de processo para permitir evoluçã
 - Atualização de `CLAUDE.md` com fluxo obrigatório, estados de backlog e regras de governança.
 - Nenhuma alteração de código de aplicação nesta fase.
 
-**Status**: em andamento.
+**Status**: concluída — commit `b47f2ea` ("chore: add autonomous development governance"), publicado em `origin/main`. Ver `BKL-015`/`BKL-016` em [BACKLOG.md](BACKLOG.md).
 
 ## Fase 2 — Consolidação de qualidade (planejada)
 

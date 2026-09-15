@@ -57,3 +57,11 @@
 **Decisão**: criar os oito documentos de governança (`PROJECT-SPEC.md`, `ROADMAP.md`, `BACKLOG.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `QA-REPORT.md`, `SECURITY-REPORT.md`, `RELEASE-CHECKLIST.md`) e ampliar `CLAUDE.md` com fluxo de estados de backlog, dependências e gates de release.
 
 **Justificativa**: o usuário solicitou evoluir o repositório para validar um fluxo de desenvolvimento autônomo e rastreável, com fonte oficial de requisitos, backlog granular com estados explícitos, e gate final de release. Nenhuma funcionalidade de aplicação foi alterada nesta etapa — mudança é exclusivamente de processo/documentação.
+
+---
+
+## 2026-09-14 — Correção de estado obsoleto no BACKLOG (BKL-015/BKL-016) e formalização do escopo da Fase 2
+
+**Decisão**: durante o início da execução autônoma do backlog, identificou-se que `BKL-015` e `BKL-016` permaneciam registrados como `EM_DESENVOLVIMENTO` ("ainda não commitado"), embora o commit `b47f2ea` já os tivesse implementado, revisado e publicado em `origin/main` em etapa anterior. Os dois itens foram avançados para `CONCLUIDO` com evidência real (hash do commit + confirmação de sincronismo local/remoto), e `ROADMAP.md` (Fase 1) foi atualizado de "em andamento" para "concluída". Também foram criados `BKL-104` (revisão de acessibilidade básica) e `BKL-105` (revisão formal de segurança da Fase 2), convertendo formalmente o escopo textual já existente em `ROADMAP.md` (Fase 2) em itens rastreáveis com ID, conforme regra 3 da governança.
+
+**Justificativa**: o `BACKLOG.md` é a fonte de verdade sobre o estado real do trabalho; mantê-lo desatualizado violaria a regra de consistência entre documentos e poderia levar a reexecutar ou pular trabalho já validado. Nenhum estado foi avançado sem evidência — a evidência já existia (commit e push confirmados na etapa anterior), apenas não havia sido refletida no arquivo.

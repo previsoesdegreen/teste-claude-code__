@@ -50,8 +50,8 @@ EM_TESTE → FALHOU_TESTE → EM_DESENVOLVIMENTO → IMPLEMENTADO → EM_TESTE
 | BKL-012 | Governança | Criação de CLAUDE.md com papéis, fluxo e regras obrigatórias | — | Alta | CONCLUIDO | Arquivo criado e versionado no commit inicial |
 | BKL-013 | Versionamento | Inicialização do repositório Git local (branch `main`) e primeiro commit | BKL-001..BKL-012 | Alta | CONCLUIDO | Commit `85240ce` — "Initial commit: Painel de Projetos" |
 | BKL-014 | Versionamento | Conexão com repositório remoto GitHub (`origin`) e push da branch `main` | BKL-013 | Alta | CONCLUIDO | `git push -u origin main` bem-sucedido; upstream `main` → `origin/main` confirmado |
-| BKL-015 | Governança | Criação da estrutura `/docs` (PROJECT-SPEC, ROADMAP, BACKLOG, ARCHITECTURE, DECISIONS, QA-REPORT, SECURITY-REPORT, RELEASE-CHECKLIST) | BKL-012 | Alta | EM_DESENVOLVIMENTO | Em criação nesta etapa — ainda não commitado |
-| BKL-016 | Governança | Atualização de CLAUDE.md com regras de governança de backlog/estados/gates | BKL-015 | Alta | EM_DESENVOLVIMENTO | Em criação nesta etapa — ainda não commitado |
+| BKL-015 | Governança | Criação da estrutura `/docs` (PROJECT-SPEC, ROADMAP, BACKLOG, ARCHITECTURE, DECISIONS, QA-REPORT, SECURITY-REPORT, RELEASE-CHECKLIST) | BKL-012 | Alta | CONCLUIDO | Revisão de consistência entre documentos e ausência de segredos executada; commit `b47f2ea` ("chore: add autonomous development governance"); push confirmado com `main` e `origin/main` sincronizados no mesmo hash |
+| BKL-016 | Governança | Atualização de CLAUDE.md com regras de governança de backlog/estados/gates | BKL-015 | Alta | CONCLUIDO | Mesma evidência de BKL-015 — commit `b47f2ea`, `git diff --stat` confirmou escopo restrito a `CLAUDE.md`/`docs/`, sem alteração de código de aplicação |
 
 ## Itens futuros (fora de escopo até autorização explícita)
 
@@ -61,3 +61,12 @@ EM_TESTE → FALHOU_TESTE → EM_DESENVOLVIMENTO → IMPLEMENTADO → EM_TESTE
 | BKL-101 | Testes | Suíte de testes automatizados para regras críticas (status atrasado, validação) | BKL-006, BKL-002 | Média | PENDENTE | — |
 | BKL-102 | Infra | CI (lint/testes/build) via GitHub Actions | BKL-014 | Baixa | PENDENTE | — |
 | BKL-103 | Deploy | Publicação em ambiente público (ex.: GitHub Pages) | BKL-014 | Baixa | PENDENTE | Requer autorização explícita do usuário (regra 26 do CLAUDE.md) |
+
+## Itens da Fase 2 (Consolidação de qualidade — ver ROADMAP.md)
+
+> Convertidos formalmente em itens rastreáveis conforme regra 3 da governança (todo escopo do ROADMAP deve virar item de BACKLOG antes de ser executado).
+
+| ID | Módulo | Descrição | Dependências | Prioridade | Status | Evidência de conclusão |
+|----|--------|-----------|---------------|------------|--------|--------------------------|
+| BKL-104 | Qualidade | Revisão de acessibilidade básica (labels, contraste, navegação por teclado) em `index.html`/`css/styles.css` | BKL-001..BKL-011 | Média | PENDENTE | — |
+| BKL-105 | Segurança | Revisão formal de segurança client-side da Fase 2 (reexecução do checklist de `SECURITY-REPORT.md` contra o estado atual do código) | BKL-001..BKL-011 | Média | PENDENTE | — |
